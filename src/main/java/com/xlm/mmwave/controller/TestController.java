@@ -111,4 +111,36 @@ public class TestController {
         response.put("breath_ring_y", breathRingY);
         return Res.ok(response);
     }
+
+
+    private int statusCounter = 0; // 用于轮询 status 值
+
+    @GetMapping("/humov/getStatus/uid/{uid}")
+    public Res getStatus(@PathVariable("uid") String uid) {
+        // 轮询状态值
+        statusCounter = (statusCounter % 4) + 1; // 循环 1, 2, 3, 4
+        Map<String, Object> response = new HashMap<>();
+        response.put("uid", uid);
+        response.put("status", statusCounter); // 返回当前状态值
+        response.put("isWarning", true); // 固定为 True
+        response.put("waringInfo", "病人已离床");
+        response.put("WarningId", 41);
+
+        return Res.ok(response);
+    }
+
+    @GetMapping("/humov/getTrack/uid/{uid}")
+    public Res getTrack(@PathVariable("uid") String uid) {
+        // 随机生成坐标值
+        Random random = new Random();
+        double x = -2 + random.nextDouble() * 4; // [-2, 2]
+        double y = random.nextDouble() * 6;      // [0, 6]
+        double z = random.nextDouble() * 2.5;    // [0, 2.5]
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("uid", uid);
+        response.put("pos", new double[]{x, y, z}); // 返回坐标值
+
+        return Res.ok(response);
+    }
 }
