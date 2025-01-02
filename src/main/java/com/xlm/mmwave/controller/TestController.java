@@ -122,8 +122,15 @@ public class TestController {
         Map<String, Object> response = new HashMap<>();
         response.put("uid", uid);
         response.put("status", statusCounter); // 返回当前状态值
-        response.put("isWarning", true); // 固定为 True
-        response.put("waringInfo", "病人已离床");
+
+        response.put("isWarning", statusCounter == 4); // 固定为 True
+
+        if (Integer.parseInt(uid) == 1) {
+            response.put("waringInfo", "病人已离床" + uid);
+        } else {
+            response.put("waringInfo", "病人已离床!!!!" + uid);
+        }
+
         response.put("WarningId", 41);
 
         return Res.ok(response);
