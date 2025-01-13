@@ -1,11 +1,12 @@
 package com.xlm.mmwave.controller;
 
 import com.xlm.mmwave.utils.Res;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.xlm.mmwave.vo.BrDataRequest;
+import com.xlm.mmwave.vo.BrDataResponse;
+import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -34,7 +35,7 @@ public class TestController {
         int i = random.nextInt();
         Map<String, Object> response = new HashMap<>();
         response.put("uid", uid);
-        response.put("heart_rate", random.nextInt(201));
+        response.put("heart_rate", random.nextInt(100) + 30);
         response.put("timestamp", System.currentTimeMillis() / 1000);
 
         return Res.ok(response);
@@ -49,7 +50,7 @@ public class TestController {
 
         // 生成心电波形数据 (heart_waveform) 和时间戳 (time_stamp)
         for (int i = 0; i < 100; i++) {
-            heartWaveform.add((int) (Math.random() * 201)); // 随机生成 0-200 之间的心电波形数据
+            heartWaveform.add((int) (Math.random() * 100) + 30); // 随机生成 0-200 之间的心电波形数据
             timeStamps.add(currentTime + i * 5); // 时间戳每5秒递增
         }
 
@@ -61,6 +62,37 @@ public class TestController {
 
         return Res.ok(response);
     }
+
+    @PostMapping("/history/br/getBrData")
+    public Res getBrData(@RequestBody BrDataRequest requestData) {
+        // 从请求中获取uid、start_time、end_time
+        int uid = requestData.getUid();
+        String startTime = requestData.getStart_time();
+        String endTime = requestData.getEnd_time();
+
+        // 假数据
+        Random random = new Random();
+        int dataLength = 100;  // 假设数据长度是100
+
+        List<Integer> humMoveCnt = new ArrayList<>();
+        List<Long> timeStamp = new ArrayList<>();
+
+        // 生成假数据
+        for (int i = 0; i < dataLength; i++) {
+            humMoveCnt.add(random.nextInt(10));  // 随机生成一个0到9之间的数
+            timeStamp.add(System.currentTimeMillis() / 1000 + i);  // 模拟一个时间戳
+        }
+
+
+
+        BrDataResponse data = new BrDataResponse();
+        data.setUid(uid);
+        data.setHum_move_cnt(humMoveCnt);
+        data.setTime_stamp(timeStamp);
+
+        return Res.ok(data);
+    }
+
 
     // 生成随机波形数据
     private List<Integer> generateWaveform(int size, int min, int max) {
@@ -126,9 +158,9 @@ public class TestController {
         response.put("isWarning", statusCounter == 4); // 固定为 True
 
         if (Integer.parseInt(uid) == 1) {
-            response.put("waringInfo", "病人已离床" + uid);
+            response.put("waringInfo", "用户离床过久！");
         } else {
-            response.put("waringInfo", "病人已离床!!!!" + uid);
+            response.put("waringInfo", "用户离床过久！" + uid);
         }
 
         response.put("WarningId", 41);
